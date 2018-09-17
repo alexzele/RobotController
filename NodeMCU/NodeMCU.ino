@@ -1,13 +1,13 @@
 /* include library */
 #include <ESP8266WiFi.h>
+#define SSID "xxxxxx"
+#define PASSWORD "xxxxxxx"
 
 /* define port */
 WiFiClient client;
 WiFiServer server(666);
 
 /* WIFI settings */
-const char* ssid = "XXXXXX";
-const char* password = "XXXXXXX";
 
 //static ip
 IPAddress ip(192, 168, 1, 177);
@@ -18,15 +18,15 @@ IPAddress subnet(255, 255, 255, 0);
 String  data =""; 
 
 /* define L298N or L293D motor control pins */
-int leftMotorForward = 2;     /* GPIO2(D4) -> IN3   */
-int rightMotorForward = 15;   /* GPIO15(D8) -> IN1  */
-int leftMotorBackward = 0;    /* GPIO0(D3) -> IN4   */
-int rightMotorBackward = 13;  /* GPIO13(D7) -> IN2  */
+const int leftMotorForward = 2;     /* GPIO2(D4) -> IN3   */
+const int rightMotorForward = 15;   /* GPIO15(D8) -> IN1  */
+const int leftMotorBackward = 0;    /* GPIO0(D3) -> IN4   */
+const int rightMotorBackward = 13;  /* GPIO13(D7) -> IN2  */
 
 
 /* define L298N or L293D enable pins */
-int rightMotorENB = 14; /* GPIO14(D5) -> Motor-A Enable */
-int leftMotorENB = 12;  /* GPIO12(D6) -> Motor-B Enable */
+const int rightMotorENB = 14; /* GPIO14(D5) -> Motor-A Enable */
+const int leftMotorENB = 12;  /* GPIO12(D6) -> Motor-B Enable */
 
 void setup()
 {
@@ -45,7 +45,7 @@ void setup()
   Serial.println("booting up");
   Serial.println("Connecting to WIFI");
   WiFi.config(ip, gateway, subnet);
-  WiFi.begin(ssid, password);
+  WiFi.begin(SSID, PASSWORD);
   while ((!(WiFi.status() == WL_CONNECTED)))
   {
     delay(300);
@@ -59,7 +59,10 @@ void setup()
   Serial.println("Server started");
   Serial.println("NodeMCU Local IP is : ");
   Serial.print((WiFi.localIP()));
-  
+
+  //Client no-delay
+  client.setNoDelay(true);
+  client.setTimeout(150);
 }
 
 void loop()
@@ -69,33 +72,36 @@ void loop()
     if (!client) {
       return; 
     }
-    data = checkClient();
+    
+    data = client.readStringUntil('\r');
 
 /************************ Run function according to incoming data from application *************************/
-    Serial.println("loop is running");
 
     /* If the incoming data is "forward", run the "MotorForward" function */
     if (data == "forward") {
-      MotorForward();
       Serial.println("moving forward");
+      MotorForward();
     }
     /* If the incoming data is "backward", run the "MotorBackward" function */
     else if(data == "backward") {
-      MotorBackward();
       Serial.println("moving backwards");
+      MotorBackward();
     }
     /* If the incoming data is "left", run the "TurnLeft" function */
     else if (data == "left"){
-      TurnLeft();
       Serial.println("moving left");
+      TurnLeft();
     }
     /* If the incoming data is "right", run the "TurnRight" function */
     else if (data == "right"){
-      TurnRight();
       Serial.println("moving right");
+      TurnRight();
     }
     /* If the incoming data is "stop", run the "MotorStop" function */
-    else if (data == "stop") MotorStop();
+    else if (data == "stop"){
+      Serial.println("stopping motor");
+      MotorStop();
+    }
 } 
 
 /********************************************* FORWARD *****************************************************/
@@ -151,13 +157,4 @@ void MotorStop(void)
   digitalWrite(leftMotorBackward,LOW);
   digitalWrite(rightMotorForward,LOW);
   digitalWrite(rightMotorBackward,LOW);
-}
-
-/********************************** RECEIVE DATA FROM the APP ******************************************/
-String checkClient(void)
-{
-  while(!client.available()) {/*do nothing*/}; 
-  String request = client.readStringUntil('\r');
-  //client.flush();
-  return request;
 }
