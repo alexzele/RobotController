@@ -1,5 +1,8 @@
 package com.example.jochm.robocontr;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,7 +28,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         t = findViewById(R.id.logoMain);
-        t.setText("Press any button to start playing around");
+        if (isNetworkAvailable()) {
+            t.setText("Press any button to start playing around");
+        } else {
+            t.setText("NO NETWORK DETECTED");
+            ((Button) findViewById(R.id.backwards)).setVisibility(View.INVISIBLE);
+            ((Button) findViewById(R.id.forward)).setVisibility(View.INVISIBLE);
+            ((Button) findViewById(R.id.button_stop)).setVisibility(View.INVISIBLE);
+            ((Button) findViewById(R.id.left)).setVisibility(View.INVISIBLE);
+            ((Button) findViewById(R.id.right)).setVisibility(View.INVISIBLE);
+        }
+
 
     }
 
@@ -75,5 +88,12 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.d("BAR", "thread finished");
         t.setText("Moving " + msg);
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }
