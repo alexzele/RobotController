@@ -1,29 +1,27 @@
 /* include library */
 #include <ESP8266WiFi.h>
+
 #define SSID "Roboto"
 #define PASSWORD "RobotoPass"
 
-/* define port */
-WiFiClient client;
-WiFiServer server(666);
+/* define L298N or L293D motor control pins */
+#define leftMotorForward   2    /* GPIO2(D4) -> IN3   */
+#define rightMotorForward  15   /* GPIO15(D8) -> IN1  */
+#define leftMotorBackward  0    /* GPIO0(D3) -> IN4   */
+#define rightMotorBackward 13   /* GPIO13(D7) -> IN2  */
 
-/* WIFI settings */
+/* define L298N or L293D enable pins */
+#define rightMotorENB 14   /* GPIO14(D5) -> Motor-A Enable */
+#define leftMotorENB  12   /* GPIO12(D6) -> Motor-B Enable */
+
+/* WiFi settings */
 IPAddress subnet(255, 255, 255, 0);
 IPAddress apIP(10, 10, 10, 1);
+WiFiServer server(666);
+WiFiClient client;
 
 /* data received from application */
 String  data = "";
-
-/* define L298N or L293D motor control pins */
-const int leftMotorForward = 2;     /* GPIO2(D4) -> IN3   */
-const int rightMotorForward = 15;   /* GPIO15(D8) -> IN1  */
-const int leftMotorBackward = 0;    /* GPIO0(D3) -> IN4   */
-const int rightMotorBackward = 13;  /* GPIO13(D7) -> IN2  */
-
-
-/* define L298N or L293D enable pins */
-const int rightMotorENB = 14; /* GPIO14(D5) -> Motor-A Enable */
-const int leftMotorENB = 12;  /* GPIO12(D6) -> Motor-B Enable */
 
 void setup()
 {
@@ -39,25 +37,19 @@ void setup()
 
   /* start server communication */
   Serial.begin(9600);
-  Serial.println("booting up");
-  Serial.println("Connecting to WIFI");
+  Serial.println("Booting up");
+  Serial.println("Starting ap");
 
   /* Setting WiFi */
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(apIP, apIP, subnet);
   WiFi.softAP(SSID, PASSWORD);
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-
+  
   /* Starting server */
   server.begin();
 
   Serial.println("Server started");
-
-  // Client no-delay
-  client.setNoDelay(true);
-  client.setTimeout(150);
+  Serial.println("Ready");
 }
 
 void loop()
