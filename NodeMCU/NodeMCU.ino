@@ -1,18 +1,14 @@
 /* include library */
 #include <ESP8266WiFi.h>
-#define SSID "xxxxxx"
-#define PASSWORD "xxxxxxx"
+#define SSID "Roboto"
 
 /* define port */
 WiFiClient client;
 WiFiServer server(666);
 
 /* WIFI settings */
-
-//static ip
-IPAddress ip(192, 168, 1, 177);
-IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
+IPAddress apIP(10,10,10,1); 
 
 /* data received from application */
 String  data =""; 
@@ -44,23 +40,21 @@ void setup()
   Serial.begin(9600);
   Serial.println("booting up");
   Serial.println("Connecting to WIFI");
-  WiFi.config(ip, gateway, subnet);
-  WiFi.begin(SSID, PASSWORD);
-  while ((!(WiFi.status() == WL_CONNECTED)))
-  {
-    delay(300);
-    Serial.print("..");
-  }
+  
+  /* Setting WiFi */
+  WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(apIP, apIP, subnet);
+  WiFi.softAP(SSID);
+  
   Serial.println("");
   Serial.println("WiFi connected");
-  
+
+  /* Starting server */
   server.begin();
 
   Serial.println("Server started");
-  Serial.println("NodeMCU Local IP is : ");
-  Serial.print((WiFi.localIP()));
 
-  //Client no-delay
+  // Client no-delay
   client.setNoDelay(true);
   client.setTimeout(150);
 }
