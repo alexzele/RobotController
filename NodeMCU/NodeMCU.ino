@@ -166,9 +166,9 @@ void MotorStop(void)
 
 bool isWall(void){
   c = 0;
-  /* if on 3 checks the distance is less than 8 cm the function will return true  */
+  /* if on 3 checks the distance is less than MAXPROX the function will return true  */
   for(i=0; i < 3; i++){
-    if (sonar.ping_cm() < 8){
+    if (sonar.ping_cm() < MAXPROX){
       c+=1;
     }
     return (c==3);
