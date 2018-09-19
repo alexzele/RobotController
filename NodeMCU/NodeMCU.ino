@@ -3,6 +3,7 @@
 /* include library */
 #include <ESP8266WiFi.h>
 
+/* define WiFi cretentials */
 #define SSID "Roboto"
 #define PASSWORD "RobotoPass"
 
