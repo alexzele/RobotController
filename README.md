@@ -22,7 +22,7 @@ Default IP for the android app is 10.10.10.1, but you can change it on the fly.
 * Enable: GPIO14(D5) -> Motor-A Enable
 * Forward: GPIO2(D4) -> IN3
 * Backward: GPIO0(D3) -> IN4
-#### right engine:
+#### Right engine:
 * Enable: GPIO12(D6) -> Motor-B Enable
 * Forward: GPIO15(D8) -> IN1
 * Backward: GPIO13(D7) -> IN
