@@ -1,3 +1,5 @@
+#include <NewPingESP8266.h>
+
 /* include library */
 #include <ESP8266WiFi.h>
 
@@ -14,14 +16,26 @@
 #define rightMotorENB 14   /* GPIO14(D5) -> Motor-A Enable */
 #define leftMotorENB  12   /* GPIO12(D6) -> Motor-B Enable */
 
+/* define trigger, echo pins and maximum proximity for proximity sensor */
+#define TRIGGER 5 /*  GPIO5(D1) -> Trigger  */
+#define ECHO 4    /*  GPI04(D2) -> Echo    */
+#define MAXPROX 8 /*  Maximum proximity in CM
+
 /* WiFi settings */
 IPAddress subnet(255, 255, 255, 0);
 IPAddress apIP(10, 10, 10, 1);
 WiFiServer server(666);
 WiFiClient client;
 
+/* Sonar constructor  */
+NewPingESP8266 sonar(TRIGGER, ECHO);
+
 /* data received from application */
 String  data = "";
+
+/* open variable to prevent memory allocation in run */
+int i = 0;
+int c = 0;
 
 void setup()
 {
@@ -56,6 +70,9 @@ void loop()
 {
   /* If the server available, run the "checkClient" function */
   client = server.available();
+  if (isWall() && data == "forward"){
+    MotorStop();
+  }
   if (!client) {
     return;
   }
@@ -144,4 +161,15 @@ void MotorStop(void)
   digitalWrite(leftMotorBackward, LOW);
   digitalWrite(rightMotorForward, LOW);
   digitalWrite(rightMotorBackward, LOW);
+}
+
+bool isWall(void){
+  c = 0;
+  /* if on 3 checks the distance is less than 8 cm the function will return true  */
+  for(i=0; i < 3; i++){
+    if (sonar.ping_cm() < 8){
+      c+=1;
+    }
+    return (c==3);
+  }
 }
